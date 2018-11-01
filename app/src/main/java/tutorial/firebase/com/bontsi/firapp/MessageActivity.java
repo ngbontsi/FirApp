@@ -85,18 +85,19 @@ private int totalMSG = 0;
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
-                    GenericTypeIndicator<List<Message>> table = new GenericTypeIndicator<List<Message>>();
-                    List<Message> message = dataSnapshot.getValue(table);
-                    if(!message.isEmpty()){
-                        totalMSG = message.size() -1;
+
+                    for(DataSnapshot message: dataSnapshot.getChildren()){
+                        Message c = message.getValue(Message.class);
+                        Log.e(TAG, "onDataChange: Message data is updated: " + c.getAuthor() + ", " + c.getTime()+ ", " + c.getBody());
+                        totalMSG++;
+                        tvAuthor.setText(c.getAuthor());
+                        tvTime.setText(c.getTime());
+                        tvBody.setText(c.getBody());
                     }
 
 
-                    Log.e(TAG, "onDataChange: Message data is updated: " + message.get(0).getAuthor() + ", " + message.get(0).getTime()+ ", " + message.get(0).getBody());
 
-                    tvAuthor.setText(message.get(0).getAuthor());
-                    tvTime.setText(message.get(0).getTime());
-                    tvBody.setText(message.get(0).getBody());
+
                 }
 
             }
@@ -165,7 +166,8 @@ private int totalMSG = 0;
     private void writeNewMessage(String body) {
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
         Message message = new Message(getUsernameFromEmail(user.getEmail()), body, time);
-        mMessageReference.child(String.valueOf(totalMSG+1)).setValue(message);
+
+        mMessageReference.child(String.valueOf(totalMSG)).setValue(message);
     }
 
     private String getUsernameFromEmail(String email) {
